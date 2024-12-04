@@ -8,14 +8,21 @@
     "example": "examples"
   },
   "scripts": {
-    "vanilla": "vite --config config/vanilla-js.vite.js"
+    "vanilla": "vite --config config/vanilla-js.vite.js",
+    "react": "vite --config config/react.vite.js"
   },
   "author": "Pluto Labs",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "vite": "^5.4.10"
   },
   "dependencies": {
-    "@plutoxyz/web-proofs": "^1.3.35"
+    "@plutoxyz/web-proofs": "^1.3.41"
   }
 }
