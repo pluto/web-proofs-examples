@@ -1,38 +1,63 @@
 import { prove } from '@plutoxyz/web-proofs'
-import { DEFAULT_CONFIG } from '../config/constants'
 
-let cleanup = null
-
-async function initializeProve() {
-  if (cleanup) cleanup()
-
-  const config = {
-    manifestUrl: document.getElementById('manifestUrl')?.value || DEFAULT_CONFIG.manifestUrl,
-    containerId: 'proveContainer',
-    preferredDeviceProveMode: document.getElementById('deviceMode')?.value || DEFAULT_CONFIG.preferredDeviceProveMode,
-    proverMode: document.getElementById('proverMode')?.value || DEFAULT_CONFIG.defaultProverMode,
-    extensionEnabled: document.getElementById('extensionEnabled')?.checked || DEFAULT_CONFIG.extensionEnabled,
-    options: {
-      showProofResult: document.getElementById('showProofResult')?.checked || DEFAULT_CONFIG.showProofResult,
-      showError: document.getElementById('showError')?.checked || DEFAULT_CONFIG.showError,
-      showLoading: document.getElementById('showLoading')?.checked || DEFAULT_CONFIG.showLoading,
-      qrCodeSize: parseInt(document.getElementById('qrCodeSize')?.value || String(DEFAULT_CONFIG.defaultQrCodeSize)),
-      styles: {
-        button: DEFAULT_CONFIG.buttonStyles
-      }
-    },
-    callbacks: {
-      onLoadingChange: (isLoading) => {
-        const container = document.getElementById('proveContainer')
-        if (container) container.classList.toggle('loading', isLoading)
-      },
-      onError: (error) => console.error('Error:', error),
-      onSuccess: (result) => console.log('Success:', result),
-      onMobileAppRedirect: () => console.log('Redirecting to mobile app...')
-    }
+// Default configuration values
+const PROVE_CONFIG = {
+  manifestUrl:
+    'https://raw.githubusercontent.com/pluto/attest-integrations/refs/heads/main/integrations/reddit-user-karma/manifest.dev.json',
+  defaultQrCodeSize: 192,
+  defaultProverMode: 'Origo',
+  preferredDeviceProveMode: 'ios',
+  extensionEnabled: false,
+  showProofResult: true,
+  showError: true,
+  showLoading: true,
+  buttonStyles: {
+    backgroundColor: '#000000',
+    color: '#ffffff',
+    padding: '10px 20px'
   }
+}
 
+// Helper function to get the value of an input element or fallback to a default value
+const getValueOrDefault = (id, fallback, parser = (val) => val) => {
+  const element = document.getElementById(id)
+  if (!element) return fallback
+  if (element.type === 'checkbox') return element.checked || fallback
+  return parser(element.value || fallback)
+}
+
+const getProveConfig = () => ({
+  manifestUrl: getValueOrDefault('manifestUrl', PROVE_CONFIG.manifestUrl),
+  containerId: 'proveContainer',
+  preferredDeviceProveMode: getValueOrDefault('deviceMode', PROVE_CONFIG.preferredDeviceProveMode),
+  proverMode: getValueOrDefault('proverMode', PROVE_CONFIG.defaultProverMode),
+  extensionEnabled: getValueOrDefault('extensionEnabled', PROVE_CONFIG.extensionEnabled),
+  options: {
+    showProofResult: getValueOrDefault('showProofResult', PROVE_CONFIG.showProofResult),
+    showError: getValueOrDefault('showError', PROVE_CONFIG.showError),
+    showLoading: getValueOrDefault('showLoading', PROVE_CONFIG.showLoading),
+    qrCodeSize: getValueOrDefault('qrCodeSize', PROVE_CONFIG.defaultQrCodeSize, parseInt),
+    styles: {
+      button: PROVE_CONFIG.buttonStyles
+    }
+  },
+  // use these callbacks to get values from the proof process
+  callbacks: {
+    onLoadingChange: (isLoading) => {
+      const container = document.getElementById('proveContainer')
+      if (container) container.classList.toggle('loading', isLoading)
+    },
+    onError: (error) => console.error('Error:', error),
+    onSuccess: (result) => console.log('Success:', result),
+    onMobileAppRedirect: () => console.log('Redirecting to mobile app...')
+  }
+})
+
+// Function to initialize the prove process
+async function initializeProve() {
   try {
+    const config = getProveConfig()
+    // Initialize the prove process
     const result = await prove(config)
     if (result.proof) console.log('Final proof:', result.proof)
     else if (result.error) console.error('Final error:', result.error)
@@ -41,9 +66,7 @@ async function initializeProve() {
   }
 }
 
-const updateButton = document.getElementById('updateConfig')
-if (updateButton) {
-  updateButton.addEventListener('click', initializeProve)
-}
+// Add an event listener to the update button
+document.getElementById('updateConfig')?.addEventListener('click', initializeProve)
 
 initializeProve()

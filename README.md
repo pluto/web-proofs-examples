@@ -37,12 +37,8 @@ Navigate to `http://localhost:5173/` in your browser.
 
 ### React
 
-- Main component: `examples/react/App.tsx`
-- Entry point: `examples/react/main.tsx`
-
-## Configuration
-
-Both examples use shared configuration from `examples/config/constants.ts`
+- Main component: `examples/react/App.jsx`
+- Entry point: `examples/react/main.jsx`
 
 ## Documentation
 
