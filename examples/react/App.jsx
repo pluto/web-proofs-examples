@@ -6,10 +6,7 @@ const App = () => {
   // starting configuration
   const [proveConfig, setProveConfig] = useState({
     manifestUrl:
-      'https://raw.githubusercontent.com/pluto/attest-integrations/refs/heads/main/integrations/reddit-user-karma/manifest.dev.json',
-    options: {
-      developerMode: true
-    }
+      'https://raw.githubusercontent.com/pluto/attest-integrations/refs/heads/main/integrations/reddit-user-karma/manifest.dev.json'
   })
 
   return (
