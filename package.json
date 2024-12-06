@@ -9,7 +9,9 @@
   },
   "scripts": {
     "vanilla": "vite --config config/vanilla-js.vite.js",
-    "react": "vite --config config/react.vite.js"
+    "vanilla:advanced": "vite --config config/vanilla-js.vite.js --mode advanced",
+    "react": "vite --config config/react.vite.js",
+    "react:advanced": "vite --config config/react.vite.js --mode advanced"
   },
   "author": "Pluto Labs",
   "license": "MIT",
@@ -20,6 +22,6 @@
     "vite": "^5.4.10"
   },
   "dependencies": {
-    "@plutoxyz/web-proofs": "^1.3.44"
+    "@plutoxyz/web-proofs": "^1.3.49"
   }
 }

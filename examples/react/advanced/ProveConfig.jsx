@@ -11,7 +11,7 @@ export const ProveConfig = ({ config, handleChange }) => (
 
     <div className="input-group">
       <label htmlFor="preferredDeviceProveMode">Device Mode:</label>
-      <select id="preferredDeviceProveMode" value={config.preferredDeviceProveMode} onChange={handleChange}>
+      <select id="preferredDeviceProveMode" value={config.options?.preferredDeviceProveMode} onChange={handleChange}>
         <option value="ios">iOS</option>
         <option value="chrome-extension">Chrome Extension</option>
       </select>
@@ -19,7 +19,7 @@ export const ProveConfig = ({ config, handleChange }) => (
 
     <div className="input-group">
       <label htmlFor="proverMode">Prover Mode:</label>
-      <select id="proverMode" value={config.proverMode} onChange={handleChange}>
+      <select id="proverMode" value={config.options?.proverMode} onChange={handleChange}>
         <option value="Origo">Origo</option>
         <option value="TLSN">TLSN</option>
       </select>
@@ -27,35 +27,40 @@ export const ProveConfig = ({ config, handleChange }) => (
 
     <div className="checkbox-group">
       <label>
-        <input type="checkbox" id="extensionEnabled" checked={config.extensionEnabled} onChange={handleChange} />
+        <input
+          type="checkbox"
+          id="extensionEnabled"
+          checked={config.options?.extensionEnabled}
+          onChange={handleChange}
+        />
         Extension Enabled
       </label>
     </div>
 
     <div className="checkbox-group">
       <label>
-        <input type="checkbox" id="showProofResult" checked={config.showProofResult} onChange={handleChange} />
+        <input type="checkbox" id="showProofResult" checked={config.options?.showProofResult} onChange={handleChange} />
         Show Proof Result
       </label>
     </div>
 
     <div className="checkbox-group">
       <label>
-        <input type="checkbox" id="showError" checked={config.showError} onChange={handleChange} />
+        <input type="checkbox" id="showError" checked={config.options?.showError} onChange={handleChange} />
         Show Error
       </label>
     </div>
 
     <div className="checkbox-group">
       <label>
-        <input type="checkbox" id="showLoading" checked={config.showLoading} onChange={handleChange} />
+        <input type="checkbox" id="showLoading" checked={config.options?.showLoading} onChange={handleChange} />
         Show Loading
       </label>
     </div>
 
     <div className="input-group">
-      <label htmlFor="defaultQrCodeSize">QR Code Size:</label>
-      <input type="number" id="defaultQrCodeSize" value={config.defaultQrCodeSize} onChange={handleChange} />
+      <label htmlFor="qrCodeSize">QR Code Size:</label>
+      <input type="number" id="qrCodeSize" value={config.options?.styles?.qrCodeSize} onChange={handleChange} />
     </div>
   </div>
 )

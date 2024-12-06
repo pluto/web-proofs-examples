@@ -6,39 +6,70 @@ This repository demonstrates how to integrate the [@plutoxyz/web-proofs](https:/
 
 ## Quick Start
 
-1. Install dependencies:
+1. Install dependencies
 
 ```bash
 npm install
 ```
 
-2. Run examples:
+2. Run examples
 
-For vanilla JavaScript:
+Basic examples:
 
 ```bash
-npm run vanilla
+npm run vanilla # Basic vanilla JavaScript example
+npm run react # Basic React example
 ```
 
-For React:
+Advanced examples with configuration UI:
 
 ```bash
-npm run react
+npm run vanilla:advanced # Advanced vanilla JavaScript example
+npm run react:advanced # Advanced React example
 ```
 
 Navigate to `http://localhost:5173/` in your browser.
 
-## Example Files
+## Basic Examples
+
+Demonstrate minimal setup required to integrate web-proofs:
+
+- Simple proof generation
+- Default configuration
+- No UI customization
 
 ### Vanilla JavaScript
 
-- Main implementation: `examples/vanilla-js/index.js`
+- Basic implementation: `examples/vanilla-js/index.js`
 - HTML template: `examples/vanilla-js/index.html`
 
 ### React
 
-- Main component: `examples/react/App.jsx`
-- Entry point: `examples/react/main.jsx`
+- Basic component: `examples/react/App.jsx`
+- Entry point:`examples/react/main.jsx`
+
+## Advanced Examples
+
+Show full capabilities with:
+
+- Configurable prover mode (Origo/TLSN)
+- Device mode selection (iOS/Chrome Extension)
+- QR code size adjustment
+- Error handling options
+- Loading state customization
+- Styling customization
+- Debug mode
+
+### Vanilla JavaScript
+
+- Advanced implementation: `examples/vanilla-js/advanced/index.js`
+- HTML template:`examples/vanilla-js/advanced/index.html`
+
+### React
+
+- Advanced component: `examples/react/advanced/App.jsx`
+- Configuration component: `examples/react/advanced/ProveConfig.jsx`
+- Entry point: `examples/react/advanced/main.jsx`
 
 ## Documentation
 
