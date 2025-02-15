@@ -77,7 +77,6 @@ For detailed documentation and integration guides, visit [docs.pluto.xyz](https:
 
 ## Community
 
-- [GitHub Discussions](https://github.com/pluto/web-proofs/discussions) - Technical discussions and best practices
 - [Telegram](https://t.me/pluto_xyz) - Community chat and support
 
 ## License
