@@ -4,6 +4,8 @@
 
 This repository demonstrates how to integrate the [@plutoxyz/web-proofs](https://www.npmjs.com/package/@plutoxyz/web-proofs) library in both vanilla JavaScript and React applications.
 
+ℹ️ The default option for generating Web Proofs is to use the Pluto-hosted notary. Developers do not need to set up the [prover](https://github.com/pluto/web-prover) or host it themselves, unless they explicitly want to self-host this infrastructure or build custom infrastructure.
+
 ## Quick Start
 
 1. Install dependencies
