@@ -6,11 +6,12 @@ body {
 }
 
 .container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
   max-width: 1200px;
   margin: 0 auto;
+  max-width: 36rem;
 }
 
 .controls,
@@ -52,6 +53,11 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 button:hover {
   opacity: 0.9;
 }
@@ -86,4 +92,82 @@ button:hover {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.error-message {
+  background: #fff2f2;
+  border: 1px solid #ffcdd2;
+  color: #d32f2f;
+  padding: 12px;
+  border-radius: 4px;
+  margin: 10px 0;
+  font-size: 14px;
+  line-height: 1.5;
+  word-wrap: break-word;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f1f9f1;
+  border: 1px solid #a5d6a7;
+  color: #1b5e20;
+  padding: 12px;
+  border-radius: 4px;
+  margin: 10px 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.success-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.success-icon::before {
+  content: '';
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background: #4caf50;
+  border-radius: 50%;
+  opacity: 0.2;
+}
+
+.success-icon::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #4caf50;
+  border-radius: 50%;
+}
+
+.success-icon svg {
+  position: relative;
+  z-index: 1;
+  color: white;
+}
+
+.transaction-link {
+  margin: 10px 0;
+}
+
+.transaction-link a {
+  display: inline-flex;
+  align-items: center;
+  color: #1976d2;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.transaction-link a:hover {
+  text-decoration: underline;
 }
