@@ -5,9 +5,7 @@ const PROVE_CONFIG = {
   manifestUrl:
     'https://raw.githubusercontent.com/pluto/attest-integrations/refs/heads/main/integrations/reddit-user-karma/manifest.dev.json',
   options: {
-    defaultProverMode: 'Origo',
-    preferredDeviceProveMode: 'ios',
-    extensionEnabled: false,
+    extensionEnabled: true,
     showProofResult: true,
     showError: true,
     showLoading: true
