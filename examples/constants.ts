@@ -1,0 +1,1 @@
+export const DEFAULT_PROVER_MODE = 'TEE'

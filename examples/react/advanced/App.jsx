@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { Prove } from '@plutoxyz/web-proofs'
+import { DEFAULT_PROVER_MODE, Prove } from '@plutoxyz/web-proofs'
 import { ProveConfig } from './ProveConfig'
+import { formatTransactionData, submitProofTx, checkProofDigest } from '../../onchain.js'
 import '../../styles/styles.css'
 
 const App = () => {
@@ -10,9 +11,9 @@ const App = () => {
       'https://raw.githubusercontent.com/pluto/attest-integrations/refs/heads/main/integrations/reddit-user-karma/manifest.dev.json',
     options: {
       preferredDeviceProveMode: 'ios',
-      proverMode: 'Origo',
+      proverMode: DEFAULT_PROVER_MODE,
       developerMode: false,
-      extensionEnabled: false,
+      extensionEnabled: true,
       showProofResult: true,
       showError: true,
       showLoading: true,
@@ -28,7 +29,30 @@ const App = () => {
     callbacks: {
       onLoadingChange: (isLoading) => console.log('Loading:', isLoading),
       onError: (error) => console.error('Error:', error),
-      onSuccess: (result) => console.log('Success:', result),
+      callbacks: {
+        onSuccess: async (result) => {
+          console.log('Success:', result)
+
+          // 2) Format the proof
+          const proofData = formatTransactionData(result.proof)
+
+          // 3) Submit the transaction
+          try {
+            const txHash = await submitProofTx(proofData)
+            console.log('Transaction broadcast, hash:', txHash)
+          } catch (err) {
+            console.error('TX failed:', err)
+          }
+
+          // 4) Check the digest
+          try {
+            const digest = await checkProofDigest()
+            console.log('Digest read from contract:', digest)
+          } catch (err) {
+            console.error('Reading digest failed:', err)
+          }
+        }
+      },
       onMobileAppRedirect: () => console.log('Redirecting to mobile app...')
     }
   })

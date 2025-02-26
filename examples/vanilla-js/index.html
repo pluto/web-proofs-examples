@@ -5,12 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Web Proofs - Vanilla JavaScript Demo</title>
     <link href="/styles/styles.css" rel="stylesheet" />
+    <style>
+      .error-message {
+        color: red;
+        margin: 10px 0;
+        display: none;
+      }
+      .success-message {
+        color: green;
+        margin: 10px 0;
+        display: none;
+      }
+      .transaction-link {
+        margin: 10px 0;
+        display: none;
+      }
+      #verifyButton {
+        display: none;
+        margin: 10px 0;
+      }
+      #loadingText {
+        display: none;
+      }
+    </style>
   </head>
   <body>
     <div class="container">
       <div class="output">
         <h2>Prove Output</h2>
         <div id="proveContainer"></div>
+
+        <button id="verifyButton">Verify Proof</button>
+        <div id="loadingText">Verifying...</div>
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message">
+          <div class="success-icon">✓</div>
+          <span>Proof verified onchain!</span>
+        </div>
+        <div class="transaction-link">
+          <a id="transactionLink" target="_blank" rel="noopener noreferrer">
+            View transaction on BaseScan
+            <svg width="12" height="12" viewBox="0 0 24 24" style="margin-left: 4px">
+              <path
+                fill="currentColor"
+                d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"
+              />
+            </svg>
+          </a>
+        </div>
       </div>
     </div>
 
