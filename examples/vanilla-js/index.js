@@ -7,7 +7,10 @@ async function initializeProve() {
     const result = await prove({
       manifestUrl:
         'https://raw.githubusercontent.com/pluto/attest-integrations/refs/heads/main/integrations/reddit-user-karma/manifest.dev.json',
-      containerId: 'proveContainer'
+      containerId: 'proveContainer',
+      options: {
+        extensionEnabled: true
+      }
     })
     if (result.proof) console.log('Final proof:', result.proof)
     else if (result.error) console.error('Final error:', result.error)
