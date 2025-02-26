@@ -10,9 +10,9 @@ const App = () => {
       'https://raw.githubusercontent.com/pluto/attest-integrations/refs/heads/main/integrations/reddit-user-karma/manifest.dev.json',
     options: {
       preferredDeviceProveMode: 'ios',
-      proverMode: 'Origo',
+      proverMode: 'TEE',
       developerMode: false,
-      extensionEnabled: false,
+      extensionEnabled: true,
       showProofResult: true,
       showError: true,
       showLoading: true,

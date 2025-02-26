@@ -20,6 +20,7 @@ export const ProveConfig = ({ config, handleChange }) => (
     <div className="input-group">
       <label htmlFor="proverMode">Prover Mode:</label>
       <select id="proverMode" value={config.options?.proverMode} onChange={handleChange}>
+        <option value="TEE">TEE</option>
         <option value="Origo">Origo</option>
         <option value="TLSN">TLSN</option>
       </select>
