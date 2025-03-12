@@ -1,5 +1,5 @@
 import { prove } from '@plutoxyz/web-proofs'
-import { submitProofOnChain, waitForProofConfirmation } from '../onchain.js'
+import { sendProofTx, awaitProofTx } from '../onchain.js'
 
 let proofData = null
 let txHash = null
@@ -11,11 +11,12 @@ function updateUI(state) {
   const errorMessage = document.getElementById('errorMessage')
   const successMessage = document.getElementById('successMessage')
   const transactionLink = document.getElementById('transactionLink')
+  const transactionLinkContainer = document.querySelector('.transaction-link')
 
   // Handle verify button
   if (verifyButton) {
     verifyButton.disabled = state.loading
-    verifyButton.style.display = state.verified ? 'none' : 'block'
+    verifyButton.style.display = state.verified ? 'none' : proofData ? 'block' : 'none'
     verifyButton.textContent = state.loading ? 'Verifying...' : 'Verify Proof'
   }
 
@@ -37,8 +38,10 @@ function updateUI(state) {
 
   // Handle transaction link
   if (transactionLink && txHash) {
-    transactionLink.style.display = 'block'
+    transactionLinkContainer.style.display = 'block'
     transactionLink.href = `https://sepolia.basescan.org/tx/${txHash}`
+  } else if (transactionLinkContainer) {
+    transactionLinkContainer.style.display = 'none'
   }
 }
 
@@ -49,12 +52,32 @@ async function verifyProof() {
 
   try {
     // Submit transaction and get hash
-    txHash = await submitProofOnChain(proofData)
-    updateUI({ loading: true, error: null, verified: false }) // Update UI to show tx link
+    const result = await sendProofTx(proofData)
+    txHash = result.txHash || null
+
+    // Update UI to show tx link if we have a hash
+    if (txHash) {
+      updateUI({ loading: true, error: null, verified: false })
+    }
+
+    // Check for error from sendProofTx
+    if (result.error) {
+      updateUI({
+        loading: false,
+        error: result.error,
+        verified: false
+      })
+      return
+    }
 
     // Wait for confirmation
-    const { verified } = await waitForProofConfirmation(txHash)
-    updateUI({ loading: false, error: null, verified })
+    const { verified, error } = await awaitProofTx(result)
+
+    updateUI({
+      loading: false,
+      error: error || null,
+      verified
+    })
   } catch (err) {
     console.error('Verification failed:', err)
     updateUI({
@@ -76,9 +99,9 @@ async function initializeProve() {
       callbacks: {
         onSuccess: (result) => {
           console.log('Success:', result)
-          proofData = result.proof['TEE']
+          proofData = result
           // Show verify button once we have proof
-          document.getElementById('verifyButton').style.display = 'block'
+          updateUI({ loading: false, error: null, verified: false })
         }
       }
     })

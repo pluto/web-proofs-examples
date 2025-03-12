@@ -23,6 +23,10 @@ const App = () => {
       'https://raw.githubusercontent.com/pluto/attest-integrations/refs/heads/main/integrations/reddit-user-karma/manifest.dev.json',
     callbacks: {
       onSuccess: async (result) => {
+        setVerifyState({ loading: false, error: null, verified: false, alreadyVerified: false })
+        setTxResult({
+          txHash: null
+        })
         setProofData(result)
       }
     }
@@ -88,9 +92,13 @@ const App = () => {
             )}
             {verifyState.error && <ErrorMessage error={verifyState.error} />}
             {verifyState.verified && (
-              <SuccessMessage verified={verifyState.verified} alreadyVerified={verifyState.alreadyVerified} />
+              <SuccessMessage
+                verified={verifyState.verified}
+                alreadyVerified={verifyState.alreadyVerified}
+                hash={txResult?.txHash}
+              />
             )}
-            {txResult?.txHash && <TransactionLink hash={txResult?.txHash} />}
+            {!verifyState.verified && txResult?.txHash ? <TransactionLink hash={txResult?.txHash} /> : null}
           </>
         )}
       </div>

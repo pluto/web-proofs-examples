@@ -9,7 +9,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 1200px;
   margin: 0 auto;
   max-width: 36rem;
 }
@@ -156,11 +155,24 @@ button:hover {
   color: white;
 }
 
+.success-content {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
 .transaction-link {
   margin: 10px 0;
 }
 
-.transaction-link a {
+.transaction-link-inline {
+  margin-left: 6px;
+  display: inline-flex;
+}
+
+.transaction-link a,
+.transaction-link-inline a {
   display: inline-flex;
   align-items: center;
   color: #1976d2;
@@ -168,6 +180,7 @@ button:hover {
   font-size: 14px;
 }
 
-.transaction-link a:hover {
+.transaction-link a:hover,
+.transaction-link-inline a:hover {
   text-decoration: underline;
 }

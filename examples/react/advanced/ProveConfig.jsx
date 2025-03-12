@@ -21,6 +21,7 @@ export const ProveConfig = ({ config, handleChange }) => (
       <label htmlFor="proverMode">Prover Mode:</label>
       <select id="proverMode" value={config.options?.proverMode} onChange={handleChange}>
         <option value="TEE">TEE</option>
+        <option value="Origo">Origo</option>
       </select>
     </div>
 
