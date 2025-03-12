@@ -22,7 +22,6 @@ export const ProveConfig = ({ config, handleChange }) => (
       <select id="proverMode" value={config.options?.proverMode} onChange={handleChange}>
         <option value="TEE">TEE</option>
         <option value="Origo">Origo</option>
-        <option value="TLSN">TLSN</option>
       </select>
     </div>
 
