@@ -1,6 +1,14 @@
 import { createPublicClient, createWalletClient, custom, encodeFunctionData, getContract, http } from 'viem'
 import { baseSepolia } from 'viem/chains'
 import contractAbi from './abi.json'
+import {
+  validateBytes32,
+  extractTransactionHash,
+  extractErrorMessage,
+  arrayToHex,
+  formatProofData,
+  validateAndFormatTransactionData
+} from './onchainUtility'
 
 const CONTRACT_ADDRESS = '0x2D386A1ED0a1D21d6E2b68bdFA480944A316B6EA'
 
@@ -12,48 +20,45 @@ function setupClients() {
     transport: http()
   })
 
-  // Create a wallet client **only** if window.ethereum is available
-  if (typeof window !== 'undefined' && window.ethereum) {
-    walletClient = createWalletClient({
-      chain: baseSepolia,
-      transport: custom(window.ethereum)
-    })
+  if (typeof window !== 'undefined') {
+    const ethereum = window['ethereum']
+    if (ethereum) {
+      walletClient = createWalletClient({
+        chain: baseSepolia,
+        transport: custom(ethereum)
+      })
+    } else {
+      walletClient = null
+    }
   } else {
     walletClient = null
   }
 
   return { publicClient, walletClient }
 }
+
 setupClients()
 
-export function formatTransactionData(proof) {
-  console.log('Proof object received:', proof)
-  if (
-    !proof.digest ||
-    !proof.r ||
-    !proof.s ||
-    proof.v === undefined ||
-    !proof.signer ||
-    !proof.manifest ||
-    !proof.value
-  ) {
-    throw new Error('Incomplete proof data; one or more fields are missing.')
-  }
-  // TODO double check structure and
-  return {
-    digest: proof.digest,
-    r: proof.r,
-    s: proof.s,
-    v: proof.v,
-    signer: proof.signer,
-    manifest: proof.manifest,
-    value: proof.value
-  }
-}
-
 export async function waitForTransaction(hash) {
-  const receipt = await publicClient.waitForTransactionReceipt({ hash })
-  return receipt
+  if (hash === null) {
+    throw new Error('No transaction hash provided, skipping transaction receipt check')
+  }
+
+  const hashToUse = extractTransactionHash(hash)
+
+  if (hashToUse === null) {
+    throw new Error('No valid transaction hash provided after extraction, skipping transaction receipt check')
+  }
+
+  console.log('Waiting for transaction receipt for hash:', hashToUse)
+  try {
+    const receipt = await publicClient?.waitForTransactionReceipt({ hash: hashToUse })
+    console.log('Transaction receipt received:', receipt)
+
+    return receipt
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function submitProofTx(proofData) {
@@ -62,99 +67,134 @@ export async function submitProofTx(proofData) {
   }
   const [address] = await walletClient.requestAddresses()
 
+  console.log('Submitting proof with data:', proofData)
+  // Ensure all values are properly formatted
+  const args = [
+    proofData.digest,
+    Number(proofData.v), // Ensure v is a number
+    proofData.r,
+    proofData.s,
+    proofData.signer,
+    proofData.manifest,
+    proofData.value
+  ]
+
   const data = encodeFunctionData({
     abi: contractAbi.abi,
     functionName: 'verifyNotarySignature',
-    args: [
-      proofData.digest,
-      proofData.v,
-      proofData.r,
-      proofData.s,
-      proofData.signer,
-      proofData.manifest,
-      proofData.value
-    ]
+    args
   })
 
   // Make sure you're on the correct chain
   await walletClient.switchChain({ id: baseSepolia.id })
 
-  // Send the transaction
-  const txHash = await walletClient.sendTransaction({
-    account: address,
-    to: CONTRACT_ADDRESS,
-    data
-  })
-
-  console.log('Transaction sent! Hash =', txHash)
-  return txHash
-}
-
-// 4) Read back the digest to confirm
-export async function checkProofDigest() {
-  if (!walletClient) {
-    throw new Error('Wallet client not initialized, no provider found')
-  }
   try {
-    const [address] = await walletClient.requestAddresses()
+    // Simulate the transaction before sending it; only way to get revert reason  https://viem.sh/docs/contract/simulateContract#simulatecontract
+    try {
+      const result = await publicClient.simulateContract({
+        address: CONTRACT_ADDRESS,
+        abi: contractAbi.abi,
+        functionName: 'verifyNotarySignature',
+        args,
+        account: address
+      })
+    } catch (simulationError) {
+      console.error(simulationError)
+      throw simulationError
+    }
 
-    const contract = getContract({
-      address: CONTRACT_ADDRESS,
-      abi: contractAbi.abi,
-      client: publicClient
+    // Send the transaction
+    const txHash = await walletClient.sendTransaction({
+      account: address,
+      to: CONTRACT_ADDRESS,
+      data
     })
 
-    const userDigest = await contract.read.digests([address])
-    console.log('Digest for', address, '=', userDigest)
+    // Ensure txHash is a string
+    const txHashString = typeof txHash === 'object' ? txHash.toString() : txHash
 
-    return userDigest
+    console.log('Transaction sent! Hash =', txHashString)
+    return txHashString
   } catch (error) {
     throw error
   }
 }
 
-export const arrayToHex = (arr) => {
-  return '0x' + arr.map((num) => num.toString(16).padStart(2, '0')).join('')
-}
-
-export async function submitProofOnChain(proofData) {
-  if (!proofData) {
-    throw new Error('No proof data provided')
-  }
-
+// New simplified sendProofTx function
+export async function sendProofTx(proofData) {
   try {
-    // Map and restructure the proof data
-    const proofDataUnformatted = {
-      digest: proofData.proof.signature.digest,
-      v: proofData.proof.signature.signature_v,
-      r: proofData.proof.signature.signature_r,
-      s: proofData.proof.signature.signature_s,
-      signer: proofData.proof.signature.signer,
-      manifest: arrayToHex(proofData.proof.data.manifest_hash),
-      value: proofData.proof.signature.merkle_leaves[0]
+    if (!proofData) {
+      throw new Error('No proof data provided')
     }
 
-    // Now validate and format the proof data
-    const txData = formatTransactionData(proofDataUnformatted)
+    // Format the proof data
+    const formattedProof = formatProofData(proofData)
+
+    // Validate and prepare transaction data
+    const txData = validateAndFormatTransactionData(formattedProof)
 
     // Submit the transaction
     const txHash = await submitProofTx(txData)
-    return txHash
+
+    return {
+      txHash,
+      digest: formattedProof.digest
+    }
   } catch (error) {
-    throw error
+    console.error(error)
+    return {
+      error: error.toString(),
+      digest: proofData?.proof?.signature?.digest || null
+    }
   }
 }
 
-export async function waitForProofConfirmation(txHash) {
+// New simplified awaitProofTx function
+export async function awaitProofTx(txResult) {
   try {
-    // Wait for transaction confirmation
-    await waitForTransaction(txHash)
+    // Handle error case from sendProofTx
+    if (txResult.error) {
+      return {
+        verified: false,
+        error: txResult.error,
+        simulationError: txResult.error
+      }
+    }
 
-    // Check the digest
-    const digest = await checkProofDigest()
+    // Extract transaction hash
+    const txHash = typeof txResult === 'object' && txResult.txHash ? txResult.txHash : txResult
 
-    return { verified: true, digest }
+    if (!txHash) {
+      return {
+        verified: false,
+        error: 'No transaction hash provided'
+      }
+    }
+
+    // Wait for transaction receipt
+    const receipt = await waitForTransaction(txHash)
+    console.log('Transaction receipt:', receipt)
+
+    // Check if transaction was successful
+    if (!receipt?.status || receipt?.status === 'reverted') {
+      return {
+        verified: false,
+        error: 'Transaction reverted. Failed to verify proof onchain.'
+      }
+    }
+
+    const verified = receipt?.status === 'success'
+
+    return {
+      verified,
+      receipt,
+      txHash
+    }
   } catch (error) {
-    throw error
+    console.error('Error in awaitProofTx:', error)
+    return {
+      verified: false,
+      error: error.toString()
+    }
   }
 }

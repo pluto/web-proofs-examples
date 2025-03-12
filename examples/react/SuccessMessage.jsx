@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const SuccessMessage = () => {
+export const SuccessMessage = ({ verified, alreadyVerified }) => {
   return (
     <div className="success-message">
       <div className="success-icon">
@@ -8,7 +8,7 @@ export const SuccessMessage = () => {
           <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
         </svg>
       </div>
-      <span>Proof verified onchain!</span>
+      <span>{alreadyVerified ? 'Proof already verified onchain!' : 'Proof verified onchain!'}</span>
     </div>
   )
 }
